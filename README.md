@@ -1,5 +1,5 @@
 # Carpet Shadow Legacy
-*Fork of MattyMatty97's Carpet-Shadow with /shadow stabalize command to force stabalizing a shadowed stack from a non player method such as an armor stand.*
+*Fork of [Ksandr707-yt's Carpet-Shadow-Legacy](https://github.com/Ksandr707-yt/Carpet-Shadow-Legacy) with /shadow stabalize command to force stabalizing a shadowed stack from a non player method such as an armor stand.*
 
 ## ENG
 
