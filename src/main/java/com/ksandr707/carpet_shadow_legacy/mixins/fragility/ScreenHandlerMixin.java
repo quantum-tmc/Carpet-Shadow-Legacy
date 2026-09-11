@@ -25,12 +25,12 @@ public abstract class ScreenHandlerMixin {
 
     @Inject(method = "internalOnSlotClick", at = @At("HEAD"))
     public void merging_start(int slotIndex, int button, SlotActionType actionType, PlayerEntity player, CallbackInfo ci){
-        Globals.mergingThreads.add(Thread.currentThread());
+        Globals.mergingStart();
     }
 
     @Inject(method = "internalOnSlotClick", at = @At("RETURN"))
     public void merging_end(int slotIndex, int button, SlotActionType actionType, PlayerEntity player, CallbackInfo ci){
-        Globals.mergingThreads.remove(Thread.currentThread());
+        Globals.mergingEnd();
     }
 
     @WrapOperation(method = "internalOnSlotClick", slice = @Slice(
