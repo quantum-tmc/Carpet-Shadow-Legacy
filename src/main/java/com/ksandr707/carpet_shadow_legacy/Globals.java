@@ -7,13 +7,32 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Globals {
 
-    public static final Set<Thread> mergingThreads = new HashSet<>();
     public static final Set<Inventory> inventoriesToMarkDirty = new HashSet<>();
+
+    // Tracks how many "merging" scopes (hopper insert/extract/transfer, screen handler clicks,
+    // item entity merges) are currently active per thread. Depth counting keeps the flag correct
+    // when scopes nest, e.g. vanilla HopperBlockEntity.transfer() running inside insert()/extract()
+    // while Lithium's optimized hopper path is active.
+    private static final Map<Thread, Integer> mergingThreads = new HashMap<>();
+
+    public static void mergingStart() {
+        mergingThreads.merge(Thread.currentThread(), 1, Integer::sum);
+    }
+
+    public static void mergingEnd() {
+        mergingThreads.compute(Thread.currentThread(), (thread, depth) -> depth != null && depth > 1 ? depth - 1 : null);
+    }
+
+    public static boolean isMergingThread() {
+        return mergingThreads.getOrDefault(Thread.currentThread(), 0) > 0;
+    }
 
     public static ItemStack getByIdOrNull(String shadow_id) {
         if(shadow_id == null)
@@ -33,7 +52,7 @@ public class Globals {
     }
     public static boolean shadow_merge_check(ItemStack stack1, ItemStack stack2, boolean ret) {
         var allowed = ret;
-        if (CarpetShadowLegacySettings.shadowItemInventoryFragilityFix && mergingThreads.contains(Thread.currentThread())) {
+        if (CarpetShadowLegacySettings.shadowItemInventoryFragilityFix && isMergingThread()) {
             var shadowStack1 = (ShadowItem) (Object) stack1;
             var shadowStack2 = (ShadowItem) (Object) stack2;
             var isStack1Shadow = shadowStack1.isItShadowItem();

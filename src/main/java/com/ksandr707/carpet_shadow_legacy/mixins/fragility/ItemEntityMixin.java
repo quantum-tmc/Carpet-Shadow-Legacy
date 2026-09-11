@@ -29,9 +29,9 @@ public abstract class ItemEntityMixin {
 
     @ModifyReturnValue(method = "canMerge(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z", at = @At("RETURN"))
     private static boolean canMerge(boolean original, ItemStack stack1, ItemStack stack2) {
-        Globals.mergingThreads.add(Thread.currentThread());
+        Globals.mergingStart();
         boolean ret = Globals.shadow_merge_check(stack1, stack2, original);
-        Globals.mergingThreads.remove(Thread.currentThread());
+        Globals.mergingEnd();
         return ret;
     }
 
@@ -48,10 +48,10 @@ public abstract class ItemEntityMixin {
 
     @Inject(method = "onPlayerCollision", at = @At("HEAD"))
     private void merging_start(PlayerEntity player, CallbackInfo ci){
-        Globals.mergingThreads.add(Thread.currentThread());
+        Globals.mergingStart();
     }
     @Inject(method = "onPlayerCollision", at = @At("RETURN"))
     private void merging_end(PlayerEntity player, CallbackInfo ci){
-        Globals.mergingThreads.remove(Thread.currentThread());
+        Globals.mergingEnd();
     }
 }
